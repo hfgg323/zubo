@@ -277,7 +277,9 @@ async def main():
         for cat in CHANNEL_CATEGORIES:
             print(f"📦 分类《{cat}》找到 {len(itv_dict[cat])} 条频道")
 
-
+        with open("itvlist.txt", 'w', encoding='utf-8') as f:
+            f.write(f"{beijing_now},{disclaimer_url}\n\n")
+    
             for cat in CHANNEL_CATEGORIES:
                 f.write(f"{cat},#genre#\n")
                 for ch in CHANNEL_CATEGORIES[cat]:
