@@ -143,17 +143,17 @@ def load_urls():
 
 async def generate_urls(url):
     modified_urls = []
-
     json_paths = [
-    "/iptv/live/1000.json?key=txiptv",
-    "/iptv/live/1001.json?key=txiptv",
-]
+        "/iptv/live/1000.json?key=txiptv",
+        "/iptv/live/1001.json?key=txiptv",
+    ]
+
     ip_port, port = url.split(":")
     ip_prefix = ip_port.rsplit('.', 1)[0]
     port = f":{port}"
 
     for i in range(1, 256):
-        ip = f"{base}{ip_prefix}.{i}{port}"
+        ip = f"http://{ip_prefix}.{i}{port}"
         for path in json_paths:
             modified_urls.append(f"{ip}{path}")
 
