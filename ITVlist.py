@@ -146,6 +146,7 @@ async def generate_urls(url):
     json_paths = [
         "/iptv/live/1000.json?key=txiptv",
         "/iptv/live/1001.json?key=txiptv",
+        "/ZHGXTV/Public/json/live_interface.txt",
     ]
 
     ip_port, port = url.split(":")
