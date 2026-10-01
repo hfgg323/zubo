@@ -24,9 +24,9 @@ URL_FILE = "https://raw.githubusercontent.com/hfgg323/zubo/main/ip_urls.txt"
 RESULTS_PER_CHANNEL = 5          # 同一频道最多保留的 URL 数量
 MAX_BYTES = 524288                # 真实播放校验：最多下载 512KB
 MIN_BYTES = 65536                 # 真实播放校验：少于 64KB 视为无效源
-CONCURRENCY = 150                # 并发限制
+CONCURRENCY = 200                # 并发限制
 JSON_TIMEOUT = 2                 # 抓取节目单 JSON 超时
-SPEED_TIMEOUT = 5                # 测速超时
+SPEED_TIMEOUT = 2                # 测速超时
 CHECK_TIMEOUT = 1                # JSON API 可用性检测超时
 
 # ==================== 频道归类映射 ====================
