@@ -169,7 +169,17 @@ def load_urls():
     except Exception as e:
         print(f"❌ 下载 {URL_FILE} 失败: {e}")
         exit()
-
+        
+def dedup_base_urls(urls):
+    seen = set()
+    deduped = []
+    for url in urls:
+        if url not in seen:
+            seen.add(url)
+            deduped.append(url)
+    print(f"🔄 基础 URL 去重: {len(urls)} → {len(deduped)} 个")
+    return deduped
+    
 async def generate_urls(url):
     modified_urls = []
     json_paths = [
@@ -248,22 +258,13 @@ async def main():
     semaphore = asyncio.Semaphore(150)  # ==============================================并发限制
 
     urls = load_urls()
-    def dedup_base_urls(urls):
-    """对基础 IP:PORT 列表去重，保持原有顺序"""
-    seen = set()
-    deduped = []
+urls = dedup_base_urls(urls)  # ✅ 去重在 URL 生成前
+
+async with aiohttp.ClientSession() as session:
+    all_urls = []
     for url in urls:
-        if url not in seen:
-            seen.add(url)
-            deduped.append(url)
-    print(f"🔄 基础 URL 去重: {len(urls)} → {len(deduped)} 个")
-    return deduped
-    
-    async with aiohttp.ClientSession() as session:
-        all_urls = []
-        for url in urls:
-            modified_urls = await generate_urls(url)
-            all_urls.extend(modified_urls)
+        modified_urls = await generate_urls(url)
+        all_urls.extend(modified_urls)
         print(f"🔍 生成待扫描 URL 共: {len(all_urls)} 个")
 
         print("⏳ 开始检测可用 JSON API...")
