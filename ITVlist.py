@@ -22,8 +22,8 @@ import requests
 URL_FILE = "https://raw.githubusercontent.com/hfgg323/zubo/main/ip_urls.txt"
 
 RESULTS_PER_CHANNEL = 5          # 同一频道最多保留的 URL 数量
-MAX_BYTES = 524288                # 真实播放校验：最多下载 512KB
-MIN_BYTES = 65536                 # 真实播放校验：少于 64KB 视为无效源
+MAX_BYTES = 1048575                # 真实播放校验：最多下载 512KB
+MIN_BYTES = 655360                 # 真实播放校验：少于 64KB 视为无效源
 CONCURRENCY = 200                # 并发限制
 JSON_TIMEOUT = 2                 # 抓取节目单 JSON 超时
 SPEED_TIMEOUT = 2                # 测速超时
@@ -322,11 +322,11 @@ def is_valid_stream(url):
 
 def speed_grade(score):
     """根据分数给稳定等级（A 最稳，D 最差）"""
-    if score < 8000:
+    if score < 10000:
         return "A"
-    if score < 11000:
-        return "B"
     if score < 15000:
+        return "B"
+    if score < 20000:
         return "C"
     return "D"
 
