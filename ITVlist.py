@@ -322,11 +322,11 @@ def is_valid_stream(url):
 
 def speed_grade(score):
     """根据分数给稳定等级（A 最稳，D 最差）"""
-    if score < 3000:
+    if score < 8000:
         return "A"
-    if score < 5000:
+    if score < 11000:
         return "B"
-    if score < 7000:
+    if score < 15000:
         return "C"
     return "D"
 
@@ -453,7 +453,6 @@ async def main():
     print("=" * 50)
     print(f"🎉 生成完成！耗时 {elapsed:.1f}s")
     print(f"   📄 TXT : {txt_path}")
-    print(f"   📄 M3U : {m3u_path}")
     print(f"   🎯 规则: 同频道最多 {RESULTS_PER_CHANNEL} 个 URL，最流畅在前")
     print("=" * 50)
 
