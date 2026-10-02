@@ -14,11 +14,11 @@ import requests
 
 URL_FILE = "https://raw.githubusercontent.com/hfgg323/zubo/main/ip_urls.txt"
 
-RESULTS_PER_CHANNEL = 3          # 同一频道最多保留的 URL 数量
+RESULTS_PER_CHANNEL = 2          # 同一频道最多保留的 URL 数量
 MAX_BYTES = 1048575                # 真实播放校验：最多下载 512KB
 MIN_BYTES = 65536                 # 真实播放校验：少于 64KB 视为无效源
 CONCURRENCY = 200                # 并发限制
-JSON_TIMEOUT = 3                 # 抓取节目单 JSON 超时
+JSON_TIMEOUT = 2                 # 抓取节目单 JSON 超时
 SPEED_TIMEOUT = 2                # 测速超时
 CHECK_TIMEOUT = 1                # JSON API 可用性检测超时
 
@@ -277,7 +277,7 @@ async def measure_speed(session, url, semaphore):
                 speed_kbps = (total_read / 1024) / max(elapsed, 0.001)
 
                 # 速度越快惩罚越小；低于 500KB/s 开始加重惩罚
-                score = elapsed * 1000 + max(0, 200 - speed_kbps) * 3
+                score = elapsed * 500 + max(0, 100 - speed_kbps) * 3
                 return int(score)
 
         except Exception:
