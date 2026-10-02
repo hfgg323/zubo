@@ -158,24 +158,14 @@ CHANNEL_MAPPING = {
 RESULTS_PER_CHANNEL = 3
 
 def load_urls():
-    """从 GitHub 下载 IPTV IP 段列表，并去重"""
+    """从 GitHub 下载 IPTV IP 段列表"""
     import requests
     try:
         resp = requests.get(URL_FILE, timeout=5)
         resp.raise_for_status()
-
-        # ✅ 去重核心代码
-        urls = []
-        seen = set()
-        for line in resp.text.splitlines():
-            line = line.strip()
-            if line and line not in seen:
-                seen.add(line)
-                urls.append(line)
-
-        print(f"📡 已加载 {len(urls)} 个基础 URL（已去重）")
+        urls = [line.strip() for line in resp.text.splitlines() if line.strip()]
+        print(f"📡 已加载 {len(urls)} 个基础 URL")
         return urls
-
     except Exception as e:
         print(f"❌ 下载 {URL_FILE} 失败: {e}")
         exit()
@@ -258,6 +248,16 @@ async def main():
     semaphore = asyncio.Semaphore(150)  # ==============================================并发限制
 
     urls = load_urls()
+    def dedup_base_urls(urls):
+    """对基础 IP:PORT 列表去重，保持原有顺序"""
+    seen = set()
+    deduped = []
+    for url in urls:
+        if url not in seen:
+            seen.add(url)
+            deduped.append(url)
+    print(f"🔄 基础 URL 去重: {len(urls)} → {len(deduped)} 个")
+    return deduped
     
     async with aiohttp.ClientSession() as session:
         all_urls = []
