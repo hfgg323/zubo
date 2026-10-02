@@ -269,14 +269,14 @@ async def measure_speed(session, url, semaphore):
     async with semaphore:
         start = time.time()
         try:
-            headers = {"Range": "bytes=0-524287"}  # 前 512KB
+            headers = {"Range": "bytes=0-1048575"}  # 前 1024KB
             async with session.get(url, headers=headers, timeout=SPEED_TIMEOUT) as resp:
 
                 # 1) 状态码校验
-                if resp.status not in (200, 206):
+                if resp.status not in (200):
                     return 999999
 
-                # 2) 读取最多 512KB
+                # 2) 读取最多 1024KB
                 total_read = 0
                 first_chunk = True
                 async for chunk in resp.content.iter_chunked(1024):
@@ -322,11 +322,11 @@ def is_valid_stream(url):
 
 def speed_grade(score):
     """根据分数给稳定等级（A 最稳，D 最差）"""
-    if score < 300:
+    if score < 3000:
         return "A"
-    if score < 800:
+    if score < 5000:
         return "B"
-    if score < 2000:
+    if score < 7000:
         return "C"
     return "D"
 
@@ -374,7 +374,7 @@ async def main():
         print(f"🧹 去重后频道总数: {len(deduped_results)} 条")
 
         # 5) 真实播放测速
-        print("🚀 开始真实播放测速（下载前 512KB + m3u8 校验）...")
+        print("🚀 开始真实播放测速（下载前 1024KB + m3u8 校验）...")
         speed_tasks = [measure_speed(session, url, semaphore) for (_, url) in deduped_results]
         speeds = await asyncio.gather(*speed_tasks)
 
