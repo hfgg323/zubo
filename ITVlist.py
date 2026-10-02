@@ -158,14 +158,24 @@ CHANNEL_MAPPING = {
 RESULTS_PER_CHANNEL = 3
 
 def load_urls():
-    """从 GitHub 下载 IPTV IP 段列表"""
+    """从 GitHub 下载 IPTV IP 段列表，并去重"""
     import requests
     try:
         resp = requests.get(URL_FILE, timeout=5)
         resp.raise_for_status()
-        urls = [line.strip() for line in resp.text.splitlines() if line.strip()]
-        print(f"📡 已加载 {len(urls)} 个基础 URL")
+
+        # ✅ 去重核心代码
+        urls = []
+        seen = set()
+        for line in resp.text.splitlines():
+            line = line.strip()
+            if line and line not in seen:
+                seen.add(line)
+                urls.append(line)
+
+        print(f"📡 已加载 {len(urls)} 个基础 URL（已去重）")
         return urls
+
     except Exception as e:
         print(f"❌ 下载 {URL_FILE} 失败: {e}")
         exit()
