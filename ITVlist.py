@@ -301,7 +301,6 @@ async def main():
 
         with open("itvlist.txt", 'w', encoding='utf-8') as f:
             
-            f.write(f"{disclaimer_url}\n\n")
 
             for cat in CHANNEL_CATEGORIES:
                 f.write(f"{cat},#genre#\n")
