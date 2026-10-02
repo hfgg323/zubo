@@ -232,12 +232,88 @@ async def fetch_json(session, url, semaphore):
 async def measure_speed(session, url, semaphore):
     async with semaphore:
         start = time.time()
+        first_byte_time = None
+        total_bytes = 0
+        last_progress = time.time()
+        stall_count = 0
         try:
-            async with session.head(url, timeout=2) as resp:  # =======================频道测速用时
-                if resp.status == 200:
-                    return int((time.time() - start) * 100)
-                else:
+            # m3u8：下载主索引 + 至少 2 个 ts 分片
+            if ".m3u8" in url:
+                try:
+                    async with session.get(url, timeout=3) as resp:
+                        if resp.status != 200:
+                            return 999999
+                        m3u8_text = await resp.text()
+
+                    ts_urls = [
+                        line.strip()
+                        for line in m3u8_text.splitlines()
+                        if line.strip() and not line.startswith("#")
+                    ]
+
+                    if not ts_urls:
+                        return 999999
+
+                    # 下载前 2 个 ts
+                    for ts_url in ts_urls[:2]:
+                        if not ts_url.startswith("http"):
+                            ts_url = urljoin(url, ts_url)
+
+                        async with session.get(ts_url, timeout=5) as ts_resp:
+                            if ts_resp.status != 200:
+                                return 999999
+                            async for chunk in ts_resp.content.iter_chunked(64 * 1024):
+                                if not chunk:
+                                    return 999999
+                                total_bytes += len(chunk)
+                                if first_byte_time is None:
+                                    first_byte_time = time.time()
+                except:
                     return 999999
+
+            # ts / mp4 / flv / mkv：持续下载 60 秒
+            else:
+                async with session.get(url, timeout=70) as resp:
+                    if resp.status != 200:
+                        return 999999
+
+                    async for chunk in resp.content.iter_chunked(128 * 1024):
+                        now = time.time()
+                        if not chunk:
+                            return 999999
+
+                        total_bytes += len(chunk)
+
+                        if first_byte_time is None:
+                            first_byte_time = now
+
+                        # 卡顿检测（>3 秒没数据）
+                        if now - last_progress > 3:
+                            stall_count += 1
+                            if stall_count >= 3:
+                                return 999999
+
+                        last_progress = now
+
+                        # ✅ 持续加载 ≥60 秒
+                        if now - start >= 60:
+                            break
+
+            # 评分规则
+            elapsed = time.time() - start
+            speed_kbps = (total_bytes / 1024) / elapsed
+
+            # 没坚持到 60 秒直接淘汰
+            if elapsed < 60:
+                return 999999
+
+            # 首包太慢也淘汰
+            if first_byte_time and (first_byte_time - start) > 3:
+                return 999999
+
+            # 分数越低越好（速度越快）
+            return int(1000 / max(speed_kbps, 1))
+
         except:
             return 999999
 
