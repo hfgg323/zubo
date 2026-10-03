@@ -245,7 +245,7 @@ async def measure_speed(session, url, semaphore):
             # —— m3u8：主索引 + 至少 3 个 ts 分片都要能读出来 ——
             if ".m3u8" in url:
                 try:
-                    async with session.get(url, timeout=5) as resp:
+                    async with session.get(url, timeout=3) as resp:
                         if resp.status != 200:
                             return 0
                         m3u8_text = await resp.text()
@@ -275,7 +275,7 @@ async def measure_speed(session, url, semaphore):
 
             # —— ts / mp4 / flv / mkv：持续下载，扛住 30 秒 ——
             else:
-                async with session.get(url, timeout=70) as resp:
+                async with session.get(url, timeout=10) as resp:
                     if resp.status != 200:
                         return 0
                     async for chunk in resp.content.iter_chunked(128 * 1024):
@@ -294,7 +294,7 @@ async def measure_speed(session, url, semaphore):
                         last_progress = now
 
                         # 持续加载满 30 秒即视为“不卡”
-                        if now - start >= 30:
+                        if now - start >= 8:
                             break
 
             elapsed = time.time() - start
@@ -306,7 +306,7 @@ async def measure_speed(session, url, semaphore):
                 return 0
 
             # ✅ 返回“稳定播放时长（秒）”，上限 30
-            return min(int(elapsed), 30)
+            return min(int(elapsed), 10)
 
         except:
             return 0
@@ -369,7 +369,7 @@ async def main():
         # ============================================================
         # ✅ 改动 2/2：按“稳定播放时长”倒序，活得最久的排最前
         # ============================================================
-        final_results.sort(key=lambda x: x[2], reverse=True)
+        final_results.sort(key=lambda x: x[3], reverse=True)
 
         itv_dict = {cat: [] for cat in CHANNEL_CATEGORIES}
         for name, url, speed in final_results:
