@@ -369,7 +369,7 @@ async def main():
         # ============================================================
         # ✅ 改动 2/2：按“稳定播放时长”倒序，活得最久的排最前
         # ============================================================
-        final_results.sort(key=lambda x: x[3], reverse=True)
+        final_results.sort(key=lambda x: x[2], reverse=True)
 
         itv_dict = {cat: [] for cat in CHANNEL_CATEGORIES}
         for name, url, speed in final_results:
