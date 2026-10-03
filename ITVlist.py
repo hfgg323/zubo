@@ -261,7 +261,7 @@ async def measure_speed(session, url, semaphore):
                     for ts_url in ts_urls[:3]:
                         if not ts_url.startswith("http"):
                             ts_url = urljoin(url, ts_url)
-                        async with session.get(ts_url, timeout=10) as ts_resp:
+                        async with session.get(ts_url, timeout=15) as ts_resp:
                             if ts_resp.status != 200:
                                 return 0
                             async for chunk in ts_resp.content.iter_chunked(64 * 1024):
@@ -275,7 +275,7 @@ async def measure_speed(session, url, semaphore):
 
             # —— ts / mp4 / flv / mkv：持续下载，扛住 30 秒 ——
             else:
-                async with session.get(url, timeout=10) as resp:
+                async with session.get(url, timeout=15) as resp:
                     if resp.status != 200:
                         return 0
                     async for chunk in resp.content.iter_chunked(128 * 1024):
@@ -294,7 +294,7 @@ async def measure_speed(session, url, semaphore):
                         last_progress = now
 
                         # 持续加载满 30 秒即视为“不卡”
-                        if now - start >= 8:
+                        if now - start >= 30:
                             break
 
             elapsed = time.time() - start
@@ -306,7 +306,7 @@ async def measure_speed(session, url, semaphore):
                 return 0
 
             # ✅ 返回“稳定播放时长（秒）”，上限 30
-            return min(int(elapsed), 10)
+            return min(int(elapsed), 30)
 
         except:
             return 0
