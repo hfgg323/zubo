@@ -255,7 +255,7 @@ def is_valid_stream(url):
 
 async def main():
     print("🚀 开始运行 ITVlist 脚本")
-    semaphore = asyncio.Semaphore(150)  # ==============================================并发限制
+    semaphore = asyncio.Semaphore(500)  # ==============================================并发限制
 
     urls = load_urls()
     
