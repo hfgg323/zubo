@@ -199,7 +199,7 @@ async def check_url(session, url, semaphore):
     async with semaphore:
         try:
             async with session.get(url, timeout=1) as resp:#===========================JSON访问时间
-                if resp.status == 206:
+                if resp.status == 200:
                     return url
         except:
             return None
