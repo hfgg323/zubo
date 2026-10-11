@@ -199,7 +199,7 @@ async def check_url(session, url, semaphore):
     async with semaphore:
         try:
             async with session.get(url, timeout=1) as resp:#===========================JSON访问时间
-                if resp.status == 200:
+                if resp.status == 206:
                     return url
         except:
             return None
@@ -234,8 +234,8 @@ async def measure_speed(session, url, semaphore):
         start = time.time()
         try:
             async with session.head(url, timeout=1) as resp:  # =======================频道测速用时
-                if resp.status == 200:
-                    return int((time.time() - start) * 400)
+                if resp.status == 206:
+                    return int((time.time() - start) * 500)
                 else:
                     return 999999
         except:
