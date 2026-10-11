@@ -163,7 +163,7 @@ def is_valid_stream(url):
         return False
     if "239." in url:
         return False
-    if url.startswith(("http://16.", "http://10.", "http://192.168.")):
+    if url.startswith(("http://16.", "http://10.", "http://120.210.193.","http://192.168.")):
         return False
     if "/paiptv/" in url or "/00/SNM/" in url or "/00/CHANNEL" in url:
         return False
