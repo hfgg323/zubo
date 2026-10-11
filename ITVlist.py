@@ -220,8 +220,6 @@ final_results = [
 
 print(f"✅ 真实可用流源: {len(final_results)} 条")
 
-        final_results.sort(key=lambda x: x[2])
-
         itv_dict = {cat: [] for cat in CHANNEL_CATEGORIES}
         for name, url, speed in final_results:
             for cat, channels in CHANNEL_CATEGORIES.items():
