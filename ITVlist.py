@@ -28,6 +28,7 @@ ERROR_PAGE_KEYWORDS = [
 ]
 
 ALLOWED_CONTENT_TYPES = [
+    "image/x-icon",
     "application/json",
     "application/javascript",
     "text/plain",
