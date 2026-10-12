@@ -140,7 +140,7 @@ async def measure_speed(session, url, semaphore):
         try:
             async with session.head(url, timeout=5) as resp:  # =======================频道测速用时
                 if resp.status == 200:
-                    return int((time.time() - start) * 600)
+                    return int((time.time() - start) * 100)
                 else:
                     return 999999
         except:
