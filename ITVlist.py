@@ -12,24 +12,73 @@ URL_FILE = "https://raw.githubusercontent.com/hfgg323/zubo/main/ip_urls.txt"
 
 
 RESULTS_PER_CHANNEL = 3
+# ======================
+# 运营商过滤配置
+# =PLACEHOLDER_1="移动"  # 可选: "移动" / "电信" / "联通" / None(不过滤)
+# ======================
+FILTER_ISP = "移动"
+
+
+def get_isp_from_ip(ip: str) -> str:
+    """
+    根据 IP 前缀判断运营商（精简版，适合 IPTV 扫描场景）
+    """
+    # 去掉端口号
+    ip_only = ip.split(":")[0]
+
+    # ========== 中国移动 ==========
+    if (ip_only.startswith("100.") or   # CGN 共享地址（移动极多）
+        ip_only.startswith(("36.", "39.", "42.", "111.", "112.",
+                            "117.", "120.", "183.", "211.",
+                            "218.", "221.", "223."))):
+        return "移动"
+
+    # ========== 中国电信 ==========
+    if ip_only.startswith(("58.", "59.", "60.", "202.", "203.",
+                           "210.", "220.", "222.")):
+        return "电信"
+
+    # ========== 中国联通 ==========
+    if ip_only.startswith(("60.", "61.", "113.", "123.",
+                           "139.", "171.", "172.", "176.")):
+        return "联通"
+
+    return "未知"
 
 def load_urls():
-    """从 GitHub 下载 IPTV IP 段列表，并去重"""
+    """
+    从 GitHub 下载 IPTV IP 段列表
+    去重 + 按运营商过滤（可配置）
+    """
     import requests
     try:
         resp = requests.get(URL_FILE, timeout=5)
         resp.raise_for_status()
 
-        # ✅ 去重核心代码
         urls = []
         seen = set()
+
         for line in resp.text.splitlines():
             line = line.strip()
-            if line and line not in seen:
-                seen.add(line)
-                urls.append(line)
+            if not line:
+                continue
 
-        print(f"📡 已加载 {len(urls)} 个基础 URL（已去重）")
+            # ===== 去重 =====
+            if line in seen:
+                continue
+            seen.add(line)
+
+            # ===== 运营商过滤 =====
+            if FILTER_ISP is not None:
+                ip = line.split(":")[0]
+                isp = get_isp_from_ip(ip)
+                if isp != FILTER_ISP:
+                    continue
+
+            urls.append(line)
+
+        isp_label = FILTER_ISP if FILTER_ISP else "不过滤"
+        print(f"📡 已加载 {len(urls)} 个基础 URL（去重完成，运营商={isp_label}）")
         return urls
 
     except Exception as e:
