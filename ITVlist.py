@@ -16,7 +16,7 @@ RESULTS_PER_CHANNEL = 3
 # 运营商过滤配置
 # =PLACEHOLDER_1="移动"  # 可选: "移动" / "电信" / "联通" / None(不过滤)
 # ======================
-FILTER_ISP = "电信"
+FILTER_ISP = "移动"
 
 
 def get_isp_from_ip(ip: str) -> str:
